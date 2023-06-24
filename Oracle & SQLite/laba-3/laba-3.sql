@@ -1,0 +1,51 @@
+SELECT name, open_mode FROM v$pdbs;
+select * from SYS.DICTIONARY;
+select * from v$pwfile_users;
+
+ALTER PLUGGABLE DATABASE TDV_PDB
+  OPEN READ WRITE FORCE;
+
+CREATE TABLESPACE u1_data_ts 
+DATAFILE 'D:\Oracle-db\oradata\XE\TDV_PDB.dbf'
+SIZE 10M AUTOEXTEND ON NEXT 5M;
+
+CREATE ROLE u1_role;
+GRANT CREATE SESSION TO u1_role;
+GRANT CREATE TABLE TO u1_role;
+GRANT CREATE VIEW TO u1_role;
+GRANT CREATE PROCEDURE TO u1_role;
+
+
+ALTER PROFILE u1_profile LIMIT
+SESSIONS_PER_USER 10
+CPU_PER_SESSION 1000000
+CPU_PER_CALL 1000
+CONNECT_TIME 30
+IDLE_TIME 5;
+
+Alter USER U1_TDV_PDB IDENTIFIED BY pass DEFAULT TABLESPACE u1_data_ts PROFILE u1_profile;
+Grant u1_role to U1_TDV_PDB;
+
+SELECT * FROM dba_tablespaces WHERE tablespace_name = 'U1_DATA_TS';
+SELECT * FROM dba_roles WHERE role = 'U1_ROLE';
+SELECT * FROM dba_profiles WHERE profile = 'U1_PROFILE';
+SELECT * FROM dba_users WHERE username = 'U1_TDV_PDB';
+SELECT tablespace_name FROM dba_tablespaces;
+SELECT file_name, tablespace_name FROM dba_data_files;
+SELECT grantee, granted_role FROM dba_role_privs;
+SELECT profile FROM dba_users;
+SELECT granted_role FROM dba_role_privs WHERE grantee = 'U1_TDV_PDB';
+
+ALTER USER U1_TDV_PDB QUOTA UNLIMITED ON U1_DATA_TS;
+
+CREATE TABLE SJND (INTER INT PRIMARY KEY);
+INSERT INTO SJND VALUES (12);
+SELECT * FROM SJND;
+
+CREATE USER C##TDV IDENTIFIED BY pass;
+grant RL_TDVCORE to C##TDV;
+GRANT u1_role TO C##TDV;
+ALTER USER C##TDV DEFAULT TABLESPACE u1_data_ts QUOTA UNLIMITED ON U1_DATA_TS;
+commit;
+
+SELECT OBJECT_NAME FROM USER_OBJECTS;

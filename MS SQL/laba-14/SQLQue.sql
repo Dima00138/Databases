@@ -1,0 +1,165 @@
+USE UNIVER;
+GO
+CREATE TABLE TR_AUDIT
+(ID INT IDENTITY,
+STMT VARCHAR(20),
+CHECK (STMT IN ('INS', 'DEL', 'UPD')),
+TRNAME VARCHAR(50),
+CC VARCHAR(300))
+GO
+CREATE TRIGGER TR_TEACHER_INS ON TEACHER AFTER INSERT
+AS DECLARE @A1 VARCHAR(10),@A2 VARCHAR(100), @A3 CHAR(1), @A4 VARCHAR(20), @IN VARCHAR(300);
+PRINT 'INSERT';
+SET @A1 = (SELECT TEACHER FROM inserted);
+SET @A2 = (SELECT TEACHER_NAME FROM inserted);
+SET @A3 = (SELECT GENDER FROM inserted);
+SET @A4 = (SELECT PULPIT FROM inserted);
+SET @IN = @A1 + ' ' + @A2 + ' ' + @A3 + ' ' + @A4 + ' ' + @IN;
+INSERT TR_AUDIT(STMT, TRNAME, CC) VALUES('INS', 'TR_TEACHER_INS', @IN);
+RETURN;
+GO
+CREATE TRIGGER TR_TEACHER_DEL ON TEACHER AFTER DELETE
+AS DECLARE @A1 VARCHAR(10),@A2 VARCHAR(100), @A3 CHAR(1), @A4 VARCHAR(20), @IN VARCHAR(300);
+PRINT 'DELETE';
+SET @A1 = (SELECT TEACHER FROM deleted);
+SET @A2 = (SELECT TEACHER_NAME FROM deleted);
+SET @A3 = (SELECT GENDER FROM deleted);
+SET @A4 = (SELECT PULPIT FROM deleted);
+SET @IN = @A1 + ' ' + @A2 + ' ' + @A3 + ' ' + @A4 + ' ' + @IN;
+INSERT TR_AUDIT(STMT, TRNAME, CC) VALUES('DEL', 'TR_TEACHER_DEL', @IN);
+RETURN;
+GO
+CREATE TRIGGER TR_TEACHER_UPD ON TEACHER AFTER UPDATE
+AS DECLARE @A1 VARCHAR(10),@A2 VARCHAR(100), @A3 CHAR(1), @A4 VARCHAR(20), @IN VARCHAR(300);
+PRINT 'UPDATE';
+SET @A1 = (SELECT TEACHER FROM deleted);
+SET @A2 = (SELECT TEACHER_NAME FROM deleted);
+SET @A3 = (SELECT GENDER FROM deleted);
+SET @A4 = (SELECT PULPIT FROM deleted);
+SET @IN = @A1 + ' ' + @A2 + ' ' + @A3 + ' ' + @A4 + ' ' + @IN;
+SET @A1 = (SELECT TEACHER FROM inserted);
+SET @A2 = (SELECT TEACHER_NAME FROM inserted);
+SET @A3 = (SELECT GENDER FROM inserted);
+SET @A4 = (SELECT PULPIT FROM inserted);
+SET @IN = @A1 + ' ' + @A2 + ' ' + @A3 + ' ' + @A4 + ' ' + @IN;
+INSERT TR_AUDIT(STMT, TRNAME, CC) VALUES('UPD', 'TR_TEACHER_UPD', @IN);
+RETURN;
+GO
+CREATE TRIGGER TR_TEACHER ON TEACHER AFTER INSERT, DELETE, UPDATE
+AS DECLARE @A1 VARCHAR(10),@A2 VARCHAR(100), @A3 CHAR(1), @A4 VARCHAR(20), @IN VARCHAR(300);
+DECLARE @INS INT = (SELECT COUNT(*) FROM inserted),
+		@DEL INT = (SELECT COUNT(*) FROM deleted);
+IF @INS > 0 AND @DEL > 0
+BEGIN
+PRINT 'UPDATE';
+SET @A1 = (SELECT TEACHER FROM deleted);
+SET @A2 = (SELECT TEACHER_NAME FROM deleted);
+SET @A3 = (SELECT GENDER FROM deleted);
+SET @A4 = (SELECT PULPIT FROM deleted);
+SET @IN = @A1 + ' ' + @A2 + ' ' + @A3 + ' ' + @A4 + ' ' + @IN;
+SET @A1 = (SELECT TEACHER FROM inserted);
+SET @A2 = (SELECT TEACHER_NAME FROM inserted);
+SET @A3 = (SELECT GENDER FROM inserted);
+SET @A4 = (SELECT PULPIT FROM inserted);
+SET @IN = @A1 + ' ' + @A2 + ' ' + @A3 + ' ' + @A4 + ' ' + @IN;
+INSERT TR_AUDIT(STMT, TRNAME, CC) VALUES('UPD', 'TR_TEACHER', @IN);
+RETURN;
+END;
+ELSE
+IF @INS > 0 AND @DEL = 0
+BEGIN
+PRINT 'INSERT';
+SET @A1 = (SELECT TEACHER FROM inserted);
+SET @A2 = (SELECT TEACHER_NAME FROM inserted);
+SET @A3 = (SELECT GENDER FROM inserted);
+SET @A4 = (SELECT PULPIT FROM inserted);
+SET @IN = @A1 + ' ' + @A2 + ' ' + @A3 + ' ' + @A4 + ' ' + @IN;
+INSERT TR_AUDIT(STMT, TRNAME, CC) VALUES('INS', 'TR_TEACHER', @IN);
+RETURN;
+END;
+ELSE
+IF @INS = 0 AND @DEL > 0
+BEGIN
+PRINT 'DELETE';
+SET @A1 = (SELECT TEACHER FROM deleted);
+SET @A2 = (SELECT TEACHER_NAME FROM deleted);
+SET @A3 = (SELECT GENDER FROM deleted);
+SET @A4 = (SELECT PULPIT FROM deleted);
+SET @IN = @A1 + ' ' + @A2 + ' ' + @A3 + ' ' + @A4 + ' ' + @IN;
+INSERT TR_AUDIT(STMT, TRNAME, CC) VALUES('DEL', 'TR_TEACHER', @IN);
+RETURN;
+END;
+GO
+INSERT TEACHER VALUES('БРГ', 'DJFFDJ', 'R', 'ИТ');
+GO
+CREATE TRIGGER TR_TEACHER_DEL1 ON TEACHER AFTER DELETE
+AS DECLARE @A1 VARCHAR(10),@A2 VARCHAR(100), @A3 CHAR(1), @A4 VARCHAR(20), @IN VARCHAR(300);
+PRINT 'DELETE';
+SET @A1 = (SELECT TEACHER FROM deleted);
+SET @A2 = (SELECT TEACHER_NAME FROM deleted);
+SET @A3 = (SELECT GENDER FROM deleted);
+SET @A4 = (SELECT PULPIT FROM deleted);
+SET @IN = @A1 + ' ' + @A2 + ' ' + @A3 + ' ' + @A4 + ' ' + @IN;
+INSERT TR_AUDIT(STMT, TRNAME, CC) VALUES('DEL', 'TR_TEACHER_DEL', @IN);
+RETURN;
+GO
+CREATE TRIGGER TR_TEACHER_DEL2 ON TEACHER AFTER DELETE
+AS DECLARE @A1 VARCHAR(10),@A2 VARCHAR(100), @A3 CHAR(1), @A4 VARCHAR(20), @IN VARCHAR(300);
+PRINT 'DELETE';
+SET @A1 = (SELECT TEACHER FROM deleted);
+SET @A2 = (SELECT TEACHER_NAME FROM deleted);
+SET @A3 = (SELECT GENDER FROM deleted);
+SET @A4 = (SELECT PULPIT FROM deleted);
+SET @IN = @A1 + ' ' + @A2 + ' ' + @A3 + ' ' + @A4 + ' ' + @IN;
+INSERT TR_AUDIT(STMT, TRNAME, CC) VALUES('DEL', 'TR_TEACHER_DEL', @IN);
+RETURN;
+GO
+CREATE TRIGGER TR_TEACHER_DEL3 ON TEACHER AFTER DELETE
+AS DECLARE @A1 VARCHAR(10),@A2 VARCHAR(100), @A3 CHAR(1), @A4 VARCHAR(20), @IN VARCHAR(300);
+PRINT 'DELETE';
+SET @A1 = (SELECT TEACHER FROM deleted);
+SET @A2 = (SELECT TEACHER_NAME FROM deleted);
+SET @A3 = (SELECT GENDER FROM deleted);
+SET @A4 = (SELECT PULPIT FROM deleted);
+SET @IN = @A1 + ' ' + @A2 + ' ' + @A3 + ' ' + @A4 + ' ' + @IN;
+INSERT TR_AUDIT(STMT, TRNAME, CC) VALUES('DEL', 'TR_TEACHER_DEL', @IN);
+RETURN;
+GO
+EXEC SP_SETTRIGGERORDER @triggername = 'TR_TEACHER_DEL3',
+				@order = 'First', @stmttype = 'DELETE';
+EXEC SP_SETTRIGGERORDER @triggername = 'TR_TEACHER_DEL2',
+				@order = 'Last', @stmttype = 'DELETE';
+select t.name, e.type_desc 
+         from sys.triggers  t join  sys.trigger_events e  
+                  on t.object_id = e.object_id  
+                            where OBJECT_NAME(t.parent_id) = 'TEACHER' and 
+	                                                                        e.type_desc = 'DELETE' ;  
+
+GO
+CREATE TRIGGER PROGN ON PROGRESS AFTER INSERT, DELETE, UPDATE
+AS DECLARE @c INT = (SELECT SUM(NOTE) FROM PROGRESS);
+IF @c > 10
+BEGIN
+	RAISERROR('OVERFLOW', 10, 1);
+	ROLLBACK;
+END;
+RETURN;
+GO
+CREATE TRIGGER NODEL ON FACULTY INSTEAD OF DELETE
+	AS RAISERROR(N'NO DELETE', 10, 1);
+RETURN;
+GO
+create  trigger DDL_UNIVER on database 
+                          for DDL_DATABASE_LEVEL_EVENTS  as   
+declare @t varchar(50) =  EVENTDATA().value('(/EVENT_INS- TANCE/EventType)[1]', 'varchar(50)');
+declare @t1 varchar(50) = EVENTDATA().value('(/EVENT_INS-TANCE/ObjectName)[1]', 'varchar(50)');
+declare @t2 varchar(50) = EVENTDATA().value('(/EVENT_INS-TANCE/ObjectType)[1]', 'varchar(50)'); 
+IF @t1 = 'UNIVER'
+BEGIN
+	print 'Тип события: '+@t;
+    print 'Имя объекта: '+@t1;
+	print 'Тип объекта: '+@t2;
+    raiserror( N'операции с баздой данных UNIVER запрещены', 16, 1);  
+    rollback;    
+end;
+GO
